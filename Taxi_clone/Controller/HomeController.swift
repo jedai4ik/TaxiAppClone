@@ -14,12 +14,14 @@ class HomeController: UIViewController {
   // MARK: - Properties
   
   private let mapView = MKMapView()
+  private let locationManager = CLLocationManager()
   
   // MARK: - Lifecycle
   
   override func viewDidLoad() {
     super.viewDidLoad()
     checkIfUserIsLoggedIn()
+    enableLocationServices()
   }
   
   // MARK: - API
@@ -46,8 +48,45 @@ class HomeController: UIViewController {
   
   //MARK: - Helper Functions
   
+  
   func configureUI() {
+    configureMapView()
+  }
+  
+  func configureMapView() {
     view.addSubview(mapView)
     mapView.frame = view.frame
+    mapView.showsUserLocation = true
+    mapView.userTrackingMode = .follow
   }
+}
+
+//MARK: - LocationServices
+
+extension HomeController: CLLocationManagerDelegate {
+  
+  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    print(#function)
+    locationManager.requestAlwaysAuthorization()
+  }
+ 
+  func enableLocationServices() {
+    switch locationManager.authorizationStatus {
+    case .notDetermined:
+      locationManager.requestWhenInUseAuthorization()
+      print("Not determined")
+    case .restricted, .denied:
+      break
+    case .authorizedAlways:
+      locationManager.startUpdatingLocation()
+      locationManager.desiredAccuracy = kCLLocationAccuracyBest
+      print("Auth always")
+    case .authorizedWhenInUse:
+      locationManager.requestAlwaysAuthorization()
+      print("Auth when in use")
+    default:
+      break
+    }
+  }
+  
 }
