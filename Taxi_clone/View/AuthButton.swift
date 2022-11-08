@@ -8,13 +8,20 @@
 import UIKit
 
 class AuthButton: UIButton {
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
-
+  
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    
+    backgroundColor = .mainBlueTint
+    layer.cornerRadius = 5
+    setTitleColor(UIColor(white: 1, alpha: 0.5), for: .normal)
+    heightAnchor.constraint(equalToConstant: 50).isActive = true
+    
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
 }

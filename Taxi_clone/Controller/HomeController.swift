@@ -6,24 +6,48 @@
 //
 
 import UIKit
+import Firebase
+import MapKit
 
 class HomeController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+  
+  // MARK: - Properties
+  
+  private let mapView = MKMapView()
+  
+  // MARK: - Lifecycle
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    checkIfUserIsLoggedIn()
+  }
+  
+  // MARK: - API
+  
+  func checkIfUserIsLoggedIn() {
+    if Auth.auth().currentUser?.uid == nil {
+      print("User not logged in")
+      DispatchQueue.main.async {
+        let nav = UINavigationController(rootViewController: LoginViewController())
+        self.present(nav, animated: true, completion: nil)
+      }
+    } else {
+      configureUI()
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+  }
+  
+  func signOut() {
+    do {
+      try Auth.auth().signOut()
+    } catch {
+      print("Error signing out")
     }
-    */
-
+  }
+  
+  //MARK: - Helper Functions
+  
+  func configureUI() {
+    view.addSubview(mapView)
+    mapView.frame = view.frame
+  }
 }
