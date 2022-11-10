@@ -15,6 +15,8 @@ class HomeController: UIViewController {
   
   private let mapView = MKMapView()
   private let locationManager = CLLocationManager()
+  private let locationInputView = LocationInputView()
+  private let chooseLocationView = ChooseLocationView()
   
   // MARK: - Lifecycle
   
@@ -22,6 +24,16 @@ class HomeController: UIViewController {
     super.viewDidLoad()
     checkIfUserIsLoggedIn()
     enableLocationServices()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+      super.viewWillAppear(animated)
+      navigationController?.setNavigationBarHidden(true, animated: animated)
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+      super.viewWillDisappear(animated)
+      navigationController?.setNavigationBarHidden(false, animated: animated)
   }
   
   // MARK: - API
@@ -51,6 +63,19 @@ class HomeController: UIViewController {
   
   func configureUI() {
     configureMapView()
+    
+    view.addSubview(locationInputView)
+    locationInputView.centerX(inView: view)
+    locationInputView.setDimensions(height: 50, width: view.frame.width - 64)
+    locationInputView.anchor(top: view.safeAreaLayoutGuide.topAnchor, paddingTop: 0)
+    locationInputView.delegate = self
+    chooseLocationView.delegate = self
+    
+    locationInputView.alpha = 0
+    
+    UIView.animate(withDuration: 1) {
+      self.locationInputView.alpha = 1
+    }
   }
   
   func configureMapView() {
@@ -58,6 +83,30 @@ class HomeController: UIViewController {
     mapView.frame = view.frame
     mapView.showsUserLocation = true
     mapView.userTrackingMode = .follow
+  }
+  
+  func configureChooseLocationView() {
+    view.addSubview(chooseLocationView)
+    chooseLocationView.anchor(top: view.topAnchor, left: view.leftAnchor,
+                              right: view.rightAnchor, height: 200)
+    chooseLocationView.alpha = 0
+    
+    UIView.animate(withDuration: 0.3, animations: {
+      self.chooseLocationView.alpha = 1
+    }) { _ in
+      print("Present table view")
+    }
+  }
+  
+  func dismissChooseLocation() {
+    UIView.animate(withDuration: 0.3, animations: {
+      self.chooseLocationView.alpha = 0
+    }) { _ in
+      UIView.animate(withDuration: 0.3, animations: {
+        self.locationInputView.alpha = 1
+      })
+      
+    }
   }
 }
 
@@ -88,5 +137,20 @@ extension HomeController: CLLocationManagerDelegate {
       break
     }
   }
+  
+}
+
+extension HomeController: LocationInputViewDelegate {
+  func presentLocationInputViewDelegate() {
+    locationInputView.alpha = 0
+    configureChooseLocationView()
+  }
+}
+
+extension HomeController: ChooseLocationViewDelegate {
+  func dismissChooseLocationView() {
+    dismissChooseLocation()
+  }
+  
   
 }
