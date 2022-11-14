@@ -9,6 +9,8 @@ import UIKit
 import Firebase
 import MapKit
 
+private let reuseIdentifier = "LocationCell"
+
 class HomeController: UIViewController {
   
   // MARK: - Properties
@@ -17,6 +19,8 @@ class HomeController: UIViewController {
   private let locationManager = CLLocationManager()
   private let locationInputView = LocationInputView()
   private let chooseLocationView = ChooseLocationView()
+  private let tableView = UITableView()
+  private final let chooseLocationViewHeight: CGFloat = 200
   
   // MARK: - Lifecycle
   
@@ -76,6 +80,7 @@ class HomeController: UIViewController {
     UIView.animate(withDuration: 1) {
       self.locationInputView.alpha = 1
     }
+    configureTableView()
   }
   
   func configureMapView() {
@@ -88,32 +93,37 @@ class HomeController: UIViewController {
   func configureChooseLocationView() {
     view.addSubview(chooseLocationView)
     chooseLocationView.anchor(top: view.topAnchor, left: view.leftAnchor,
-                              right: view.rightAnchor, height: 200)
+                              right: view.rightAnchor, height: chooseLocationViewHeight)
     chooseLocationView.alpha = 0
     
     UIView.animate(withDuration: 0.3, animations: {
       self.chooseLocationView.alpha = 1
+      self.chooseLocationView.animateIndicator()
+      
     }) { _ in
-      print("Present table view")
+      UIView.animate(withDuration: 0.3) {
+        self.tableView.frame.origin.y = self.chooseLocationViewHeight
+      }
     }
   }
   
-  func dismissChooseLocation() {
-    UIView.animate(withDuration: 0.3, animations: {
-      self.chooseLocationView.alpha = 0
-    }) { _ in
-      UIView.animate(withDuration: 0.3, animations: {
-        self.locationInputView.alpha = 1
-      })
-      
-    }
+  func configureTableView() {
+    tableView.delegate = self
+    tableView.dataSource = self
+    tableView.register(LocationCell.self, forCellReuseIdentifier: reuseIdentifier)
+    tableView.rowHeight = 60
+    tableView.tableFooterView = UIView()
+    let height = view.frame.height - chooseLocationViewHeight
+    tableView.frame = CGRect(x: 0, y: view.frame.height,
+                             width: view.frame.width, height: height)
+    view.addSubview(tableView)
+    
   }
 }
 
 //MARK: - LocationServices
 
 extension HomeController: CLLocationManagerDelegate {
-  
   func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
     print(#function)
     locationManager.requestAlwaysAuthorization()
@@ -150,6 +160,40 @@ extension HomeController: LocationInputViewDelegate {
 extension HomeController: ChooseLocationViewDelegate {
   func dismissChooseLocationView() {
     dismissChooseLocation()
+  }
+  
+  func dismissChooseLocation() {
+    UIView.animate(withDuration: 0.3, animations: {
+      self.chooseLocationView.alpha = 0
+      self.tableView.frame.origin.y = self.view.frame.height
+    }) { _ in
+      self.chooseLocationView.removeFromSuperview()
+      UIView.animate(withDuration: 0.3, animations: {
+        self.locationInputView.alpha = 1
+      })
+    }
+  }
+}
+
+
+// MARK: - UITableViewDelegate/UITableViewDataSource
+
+extension HomeController: UITableViewDelegate, UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    section == 0 ? 2 : 5
+  }
+  
+  func numberOfSections(in tableView: UITableView) -> Int {
+    2
+  }
+  
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    "Test"
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as! LocationCell
+    return cell
   }
   
   
