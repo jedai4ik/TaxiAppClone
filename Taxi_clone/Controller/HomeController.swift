@@ -21,6 +21,9 @@ class HomeController: UIViewController {
   private let chooseLocationView = ChooseLocationView()
   private let tableView = UITableView()
   private final let chooseLocationViewHeight: CGFloat = 200
+  private var user: User? {
+    didSet { chooseLocationView.user = user }
+  }
   
   // MARK: - Lifecycle
   
@@ -28,6 +31,8 @@ class HomeController: UIViewController {
     super.viewDidLoad()
     checkIfUserIsLoggedIn()
     enableLocationServices()
+    fetchUserData()
+//    try! Auth.auth().signOut()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -48,6 +53,7 @@ class HomeController: UIViewController {
       DispatchQueue.main.async {
         let nav = UINavigationController(rootViewController: LoginViewController())
         self.present(nav, animated: true, completion: nil)
+        
       }
     } else {
       configureUI()
@@ -59,6 +65,12 @@ class HomeController: UIViewController {
       try Auth.auth().signOut()
     } catch {
       print("Error signing out")
+    }
+  }
+  
+  func fetchUserData() {
+    Service.shared.fetchUserData { user in
+      self.user = user
     }
   }
   
@@ -180,15 +192,15 @@ extension HomeController: ChooseLocationViewDelegate {
 
 extension HomeController: UITableViewDelegate, UITableViewDataSource {
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    section == 0 ? 2 : 5
+    return section == 0 ? 2 : 5
   }
   
   func numberOfSections(in tableView: UITableView) -> Int {
-    2
+    return 2
   }
   
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    "Test"
+    return "Test"
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

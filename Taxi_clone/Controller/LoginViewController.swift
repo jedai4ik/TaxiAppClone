@@ -88,7 +88,8 @@ class LoginViewController: UIViewController {
         return
       }
       print("Successfully log user in ")
-      guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
+//      guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
+      guard let controller = UIApplication.shared.connectedScenes.compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first?.rootViewController as? HomeController else { return }
       controller.configureUI()
       self.dismiss(animated: true, completion: nil)
     }
@@ -121,6 +122,5 @@ class LoginViewController: UIViewController {
     navigationController?.navigationBar.barStyle = .black
   }
   
-  
-  
+
 }

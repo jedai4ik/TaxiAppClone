@@ -121,8 +121,9 @@ class SignUpController: UIViewController {
         if let error = error {
           print("Firebase error \(error)")
         }
-        guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
-        controller.configureUI()
+        
+        UIApplication.shared.windows.first?.rootViewController = HomeController()
+//        controller.configureUI()
         self.dismiss(animated: true, completion: nil)
       }
     }

@@ -30,5 +30,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:396853589000:ios:ccbfbd19423fb56d050dbd</string>
+	<key>DATABASE_URL</key>
+	<string>https://gettaxi-6e486-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>
